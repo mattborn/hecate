@@ -1,5 +1,10 @@
 /* reset Artemis styles */
 
+.hecate .listview-settings-control {
+  background: none;
+  color: inherit;
+}
+
 /* reset Zeus styles */
 html { min-width: 100vw; }
 
@@ -11,11 +16,16 @@ html { min-width: 100vw; }
 }
 
 .hecate button,
+.hecate .mat-toolbar,
 .hecate .mat-table,
 .hecate .mat-form-field,
 .hecate .mat-select,
 .hecate .mat-paginator-page-size .mat-select-trigger {
   font-family: inherit;
+}
+.hecate .mat-toolbar {
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .hecate .mat-drawer-container,
@@ -71,4 +81,10 @@ html { min-width: 100vw; }
 .hecate .sidenav-footer,
 .hecate .app-footer {
   display: none !important;
+}
+
+/* light touches for Zeus */
+
+.hecate .app-header .mat-toolbar {
+  box-shadow: 0 3px 9px rgba(8,22,36,.1)
 }

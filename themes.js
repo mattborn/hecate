@@ -30,8 +30,13 @@ blog('Themes loaded');
   const userRef = firebase.database().ref('hack/mborn')
   userRef.on('value', (snapshot) => {
     const data = snapshot.val()
-    document.body.classList.remove('theme-Light', 'theme-Maria')
+    document.body.classList.remove('theme-Default', 'theme-Light', 'theme-Maria', 'theme-Future')
     document.body.classList.add('theme-'+ data.theme)
+    if (data.theme === 'Default') {
+      document.body.classList.remove('hecate')
+    } else {
+      document.body.classList.add('hecate')
+    }
   })
 
 })() // this executes the anonymous function wrapping everything

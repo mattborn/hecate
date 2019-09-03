@@ -13,7 +13,7 @@ blog('Persist loaded');
 
   // window.hecate = persist || defaults
 
-  window.userRef = firebase.database().ref('hack/mborn')
+  const userRef = firebase.database().ref('hack/mborn')
   userRef.once('value').then((snapshot) => {
     if (!snapshot.exists()) userRef.set(defaults)
   })

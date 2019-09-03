@@ -1,7 +1,18 @@
 window.DEV = false // CHANGE TO FALSE BEFORE COMMITTING!
 
-console.log('%c🖤 Hecate loaded', 'color:#28f');
+/**
+ * Displays console logs with black hearts and blue text
+ * 
+ * @param {String} text any message you want to write to console
+ */
+window.blog = (text) => {
+  console.log('%c🖤 '+ text, 'color:#28f')
+}
+blog('Hecate loaded')
 
+/**
+ * Just like it sounds
+ */
 function getSourceURL() {
   return DEV ? 'http://localhost:1666/' : 'https://raw.githack.com/mattborn/hecate/master/'
 }
@@ -30,6 +41,17 @@ function injectLocalDeps(scripts) {
   })
 }
 
+/**
+ * 
+ * @param {*} filename only one file per call
+ */
+function injectStyles(filename) {
+  const css = document.createElement('link')
+  css.href = getSourceURL() + filename +'.css?v='+Date.now()
+  css.rel = 'stylesheet'
+  document.querySelector('head').appendChild(css)
+}
+
 (() => { // wrap everything in anonymous function for iteration
 
   const externalDeps = [
@@ -39,7 +61,6 @@ function injectLocalDeps(scripts) {
     'https://unpkg.com/scrollreveal'
   ]
   const localDeps = [
-    'helpers',
     'persist',
     'personalize',
     'themes',
@@ -87,3 +108,22 @@ function injectLocalDeps(scripts) {
   }, 100)
 
 })() // this executes the anonymous function wrapping everything
+
+// ☠️ nevermind all this 🔥 switching to Firebase
+// /**
+//  * Update global state, save localStorage, fire render event
+//  * 
+//  * @param {String} key 
+//  * @param {*} value 
+//  */
+// window.updateState = (key, value) => {
+//   // update global state
+//   hecate[key] = value
+//   // save localStorage
+//   localStorage.setItem('hecate', JSON.stringify(hecate))
+//   // fire render event
+//   const render = new Event('render')
+//   document.dispatchEvent(render)
+// }
+// document.addEventListener('render', () => blog('Render test'))
+
