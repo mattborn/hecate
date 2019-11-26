@@ -1,1 +1,0 @@
-console.log('%c🖤 Charts loaded', Date.now(), 'color:#28f')
