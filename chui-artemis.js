@@ -46,6 +46,12 @@ function injectFirebaseLibs() {
   })
 }
 
+const appHeader = document.querySelector('.app-header .mat-toolbar')
+const chuiHeader = document.createElement('div')
+chuiHeader.id = 'Header'
+appHeader.insertBefore(chuiHeader, appHeader.children[3])
+const Header = document.getElementById('Header')
+
 function allScriptsLoaded() {
   blog('All scripts loaded. Initializing…')
 
@@ -59,26 +65,57 @@ function allScriptsLoaded() {
     appId: "1:45682059855:web:bbe1585244dcae79"
   })
 
+  firebase.auth().onAuthStateChanged(user => {
+    if (user) {
+      const handle = user.email.split('@')[0]
+      const usersRef = firebase.database().ref('users/'+ handle)
+      const myConnectionsRef = firebase.database().ref('users/'+ handle +'/connections')
+      const lastOnlineRef = firebase.database().ref('users/'+ handle +'/lastOnline')
+  
+      firebase.database().ref('.info/connected').on('value', snap => {
+        if (snap.val() === true) {
+          usersRef.onDisconnect().set({status: 'offline'})
+          usersRef.set({status: 'online'})
+          let con = myConnectionsRef.push()
+          con.onDisconnect().set({ended: firebase.database.ServerValue.TIMESTAMP})
+          con.set({
+            began: firebase.database.ServerValue.TIMESTAMP,
+            userAgent: navigator.userAgent,
+          })
+          lastOnlineRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP)
+        }
+      })
+      let button = document.createElement('button')
+      button.innerText = 'Sign Out'
+      button.onclick = () => { firebase.auth().signOut() }
+      Header.innerHTML = ''
+      Header.appendChild(button)
+      render()
+    } else {
+      let button = document.createElement('button')
+      button.innerText = 'Sign in with Google'
+      button.onclick = () => { signIn() }
+      Header.innerHTML = ''
+      Header.appendChild(button)
+    }
+  })
+}
+
+function signIn() {
   const provider = new firebase.auth.GoogleAuthProvider()
   firebase.auth().signInWithPopup(provider).then(result => {
-    const token = result.credential.accessToken
-    const user = result.user
-    const handle = user.email.split('@')[0]
-
-    const myConnectionsRef = firebase.database().ref('users/'+ handle +'/connections')
-    const lastOnlineRef = firebase.database().ref('users/'+ handle +'/lastOnline')
-    const connectedRef = firebase.database().ref('.info/connected')
-
-    connectedRef.on('value', function(snap) {
-      if (snap.val() === true) {
-        let con = myConnectionsRef.push()
-        con.onDisconnect().remove()
-        con.set({
-          at: firebase.database.ServerValue.TIMESTAMP,
-          userAgent: navigator.userAgent,
-        })
-        lastOnlineRef.onDisconnect().set(firebase.database.ServerValue.TIMESTAMP)
-      }
-    })
+    // const token = result.credential.accessToken
+    // const user = result.user
   }).catch(error => console.error)
+}
+
+function render() {
+  const usersRef = firebase.database().ref('users')
+
+  usersRef.on('value', snap => {
+    console.log(snap.numChildren())
+    snap.forEach(s => {
+      console.log(s.key)
+    })
+  })
 }
