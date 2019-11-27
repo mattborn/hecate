@@ -49,8 +49,16 @@ function injectFirebaseLibs() {
 const appHeader = document.querySelector('.app-header .mat-toolbar')
 const chuiHeader = document.createElement('div')
 chuiHeader.id = 'Header'
+const chuiStatus = document.createElement('div')
+chuiStatus.id = 'Status'
+chuiHeader.appendChild(chuiStatus)
+const chuiAction = document.createElement('div')
+chuiAction.id = 'Action'
+chuiHeader.appendChild(chuiAction)
 appHeader.insertBefore(chuiHeader, appHeader.children[3])
-const Header = document.getElementById('Header')
+// const Header = document.getElementById('Header')
+const Status = document.getElementById('Status')
+const Action = document.getElementById('Action')
 
 function allScriptsLoaded() {
   blog('All scripts loaded. Initializing…')
@@ -68,16 +76,16 @@ function allScriptsLoaded() {
   firebase.auth().onAuthStateChanged(user => {
     if (user) {
       const handle = user.email.split('@')[0]
-      const usersRef = firebase.database().ref('users/'+ handle)
+      const myUserRef = firebase.database().ref('users/'+ handle)
       const myConnectionsRef = firebase.database().ref('users/'+ handle +'/connections')
       const lastOnlineRef = firebase.database().ref('users/'+ handle +'/lastOnline')
   
       firebase.database().ref('.info/connected').on('value', snap => {
         if (snap.val() === true) {
-          usersRef.onDisconnect().set({status: 'offline'})
-          usersRef.set({status: 'online'})
+          myUserRef.onDisconnect().update({status: 'offline'})
+          myUserRef.set({status: 'online'})
           let con = myConnectionsRef.push()
-          con.onDisconnect().set({ended: firebase.database.ServerValue.TIMESTAMP})
+          con.onDisconnect().update({ended: firebase.database.ServerValue.TIMESTAMP})
           con.set({
             began: firebase.database.ServerValue.TIMESTAMP,
             userAgent: navigator.userAgent,
@@ -88,15 +96,17 @@ function allScriptsLoaded() {
       let button = document.createElement('button')
       button.innerText = 'Sign Out'
       button.onclick = () => { firebase.auth().signOut() }
-      Header.innerHTML = ''
-      Header.appendChild(button)
-      render()
+      Action.innerHTML = ''
+      Action.appendChild(button)
+
+      const usersRef = firebase.database().ref('users')
+      usersRef.on('value', snap => { render(snap) })
     } else {
       let button = document.createElement('button')
       button.innerText = 'Sign in with Google'
       button.onclick = () => { signIn() }
-      Header.innerHTML = ''
-      Header.appendChild(button)
+      Action.innerHTML = ''
+      Action.appendChild(button)
     }
   })
 }
@@ -109,13 +119,21 @@ function signIn() {
   }).catch(error => console.error)
 }
 
-function render() {
-  const usersRef = firebase.database().ref('users')
-
-  usersRef.on('value', snap => {
-    console.log(snap.numChildren())
-    snap.forEach(s => {
-      console.log(s.key)
-    })
+function render(snap) {
+  // blog(snap.numChildren()+ ' total users')
+  let numOnline = 0
+  let users = {}
+  snap.forEach(s => {
+    if (s.val().status === 'online') numOnline++
+    users[s.key] = s.val()
   })
+  console.log(users)
+  Status.innerText = numOnline === 1 ? 'Just you online' : numOnline +' users online'
 }
+
+/* inject first stylesheet */
+const c = JSON.parse(localStorage.getItem('chui'))
+const css = document.createElement('link')
+css.href = (c ? c.src : 'https://raw.githack.com/mattborn/hecate/master')+ '/hecate-zeus.css'
+css.rel = 'stylesheet'
+document.querySelector('head').appendChild(css)

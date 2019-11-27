@@ -1,0 +1,19 @@
+.app-header .mat-toolbar { background: #28f; }
+
+#Header {
+  display: flex;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif, "Apple Color Emoji";
+  font-size: 15px;
+}
+#Status {}
+#Action button {
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+  color: #28f;
+  /* font: inherit; */
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 1em;
+}
