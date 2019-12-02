@@ -177,12 +177,12 @@ function render(snap) {
   Status.innerText = numOnline === 1 ? 'Just you online' : numOnline +' users online'
 }
 document.addEventListener('click', () => {
-  setTimeout(() => {
-    if (firebase) {
+  if (me) {
+    setTimeout(() => {
       const myUserRef = firebase.database().ref('users/'+ me)
       myUserRef.set({pathname: location.pathname})
-    }
-  }, 500)
+    }, 500)
+  }
 })
 
 function togglePresence() {
