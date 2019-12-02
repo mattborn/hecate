@@ -192,6 +192,6 @@ function togglePresence() {
 /* inject first stylesheet */
 const c = JSON.parse(localStorage.getItem('chui'))
 const css = document.createElement('link')
-css.href = (c ? c.src : 'https://raw.githack.com/mattborn/hecate/master')+ '/hecate-zeus.css'
+css.href = (c ? c.src : 'https://cdn.jsdelivr.net/gh/mattborn/hecate')+ '/hecate-zeus.css'
 css.rel = 'stylesheet'
 document.querySelector('head').appendChild(css)
