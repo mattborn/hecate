@@ -51,6 +51,7 @@ const chuiHeader = document.createElement('div')
 chuiHeader.id = 'Header'
 const chuiStatus = document.createElement('div')
 chuiStatus.id = 'Status'
+chuiStatus.onclick = () => { togglePresence() }
 chuiHeader.appendChild(chuiStatus)
 const chuiAction = document.createElement('div')
 chuiAction.id = 'Action'
@@ -59,6 +60,13 @@ appHeader.insertBefore(chuiHeader, appHeader.children[3])
 // const Header = document.getElementById('Header')
 const Status = document.getElementById('Status')
 const Action = document.getElementById('Action')
+
+const chuiPresence = document.createElement('div')
+chuiPresence.id = 'Presence'
+document.body.appendChild(chuiPresence)
+const Presence = document.getElementById('Presence')
+
+let me = ''
 
 function allScriptsLoaded() {
   blog('All scripts loaded. Initializing…')
@@ -79,11 +87,15 @@ function allScriptsLoaded() {
       const myUserRef = firebase.database().ref('users/'+ handle)
       const myConnectionsRef = firebase.database().ref('users/'+ handle +'/connections')
       const lastOnlineRef = firebase.database().ref('users/'+ handle +'/lastOnline')
+      me = handle
   
       firebase.database().ref('.info/connected').on('value', snap => {
         if (snap.val() === true) {
           myUserRef.onDisconnect().update({status: 'offline'})
-          myUserRef.set({status: 'online'})
+          myUserRef.set({
+            pathname: location.pathname,
+            status: 'online',
+          })
           let con = myConnectionsRef.push()
           con.onDisconnect().update({ended: firebase.database.ServerValue.TIMESTAMP})
           con.set({
@@ -123,12 +135,58 @@ function render(snap) {
   // blog(snap.numChildren()+ ' total users')
   let numOnline = 0
   let users = {}
+  Presence.innerHTML = ''
   snap.forEach(s => {
-    if (s.val().status === 'online') numOnline++
-    users[s.key] = s.val()
+    const val = s.val()
+    const status = val.status
+    if (status === 'online') numOnline++
+    const User = document.createElement('div')
+    User.className = 'Presence-User'
+    User.classList.add(status)
+    // left side
+    const UserImage = document.createElement('div')
+    UserImage.className = 'Presence-User-Image'
+    User.appendChild(UserImage)
+    // right side
+    const UserInfo = document.createElement('div')
+    UserInfo.className = 'Presence-User-Info'
+    // top of right side
+    const UserHead = document.createElement('div')
+    UserHead.className = 'Presence-User-Head'
+    const UserName = document.createElement('div')
+    UserName.className = 'Presence-User-Name'
+    UserName.innerText = s.key
+    UserHead.appendChild(UserName)
+    const UserTime = document.createElement('div')
+    UserTime.className = 'Presence-User-Time'
+    UserTime.textContent = moment(val.lastOnline).fromNow()
+    UserHead.appendChild(UserTime)
+    UserInfo.appendChild(UserHead)
+    // bottom of right side
+    const UserPath = document.createElement('div')
+    UserPath.className = 'Presence-User-Path'
+    UserPath.textContent = val.pathname
+    UserInfo.appendChild(UserPath)
+    User.appendChild(UserInfo)
+    Presence.appendChild(User)
+    // detect pathname collision
+    if (s.key !== me && location.pathname === val.pathname) {
+      document.body.classList.add('collision-detected')
+    }
   })
-  console.log(users)
   Status.innerText = numOnline === 1 ? 'Just you online' : numOnline +' users online'
+}
+document.addEventListener('click', () => {
+  setTimeout(() => {
+    if (firebase) {
+      const myUserRef = firebase.database().ref('users/'+ me)
+      myUserRef.set({pathname: location.pathname})
+    }
+  }, 500)
+})
+
+function togglePresence() {
+  Presence.classList.toggle('visible')
 }
 
 /* inject first stylesheet */
