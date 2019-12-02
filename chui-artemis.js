@@ -134,6 +134,7 @@ function signIn() {
 function render(snap) {
   // blog(snap.numChildren()+ ' total users')
   let numOnline = 0
+  let noCollusion = []
   Presence.innerHTML = ''
   snap.forEach(s => {
     const val = s.val()
@@ -172,8 +173,13 @@ function render(snap) {
     // detect pathname collision
     if (s.key !== me && location.pathname === val.pathname) {
       document.body.classList.add('collision-detected')
+    } else {
+      noCollusion.push(s.key)
     }
   })
+  if (noCollusion.length === snap.numChildren()) {
+    document.body.classList.remove('collision-detected')
+  }
   Status.innerText = numOnline === 1 ? 'Just you online' : numOnline +' users online'
 }
 document.addEventListener('click', () => {
