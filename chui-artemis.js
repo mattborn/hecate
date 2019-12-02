@@ -134,7 +134,6 @@ function signIn() {
 function render(snap) {
   // blog(snap.numChildren()+ ' total users')
   let numOnline = 0
-  let users = {}
   Presence.innerHTML = ''
   snap.forEach(s => {
     const val = s.val()
@@ -166,6 +165,7 @@ function render(snap) {
     const UserPath = document.createElement('div')
     UserPath.className = 'Presence-User-Path'
     UserPath.textContent = val.pathname
+    UserPath.title = val.pathname
     UserInfo.appendChild(UserPath)
     User.appendChild(UserInfo)
     Presence.appendChild(User)
