@@ -19,4 +19,4 @@ Run `live-server --port=1666` & execute `localStorage.setItem('chui', JSON.strin
 
 - [x] Loop & load external scripts
 - [x] Support email-based accounts with Firebase
-- [ ] Display online users in Zeus
+- [x] Display online users in Zeus
